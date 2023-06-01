@@ -1,10 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import bridge from '@vkontakte/vk-bridge';
 import PropTypes from 'prop-types';
 
 import { Panel, PanelHeader, Header, Button, Group, Cell, Div, Avatar, FormLayout, FormItem, FormLayoutGroup, Input, CellButton } from '@vkontakte/vkui';
 
-const Auth = ({ id, go }) => (
+
+const Auth = ({ id, go }) => {
+
+	const [login, setLogin] = useState('');
+
+	const [password, setPassword] = useState('');
+
+	const Login = e => {
+		console.log(login);
+		console.log(password);
+	}
+
+	return(
 	<Panel id={id}>
 		<PanelHeader>Авторизация</PanelHeader>
 
@@ -12,32 +24,26 @@ const Auth = ({ id, go }) => (
 			
 			<FormLayout>
 				<FormLayoutGroup mode="vertical">
-					<FormItem top="Имя">
-						<Input />
+					<FormItem top="Логин">
+						<Input onChange={e => setLogin(e.target.value)}
+						value = {login}/>
 					</FormItem>
-					<FormItem top="Фамилия">
-						<Input />
-					</FormItem>
-				</FormLayoutGroup>
-
-				<FormLayoutGroup mode="horizontal" segmented>
-					<FormItem top="Имя ящика">
-						<Input />
+					<FormItem top="Пароль">
+						<Input onChange={e => setPassword(e.target.value)}
+						value = {password}/>
 					</FormItem>
 				</FormLayoutGroup>
 			</FormLayout>
 
-			<CellButton onClick={Login}>Войти</CellButton>
+			<CellButton onClick={e => Login(e)}>Войти</CellButton>
 			<CellButton onClick={BecomeAClient}>Стать клиентом</CellButton>
 
 
 		</Group>
-	</Panel>
-);
+	</Panel>)
+};
 
-const Login = () => {
 
-}
 
 const BecomeAClient = () => {
 	bridge.send('VKWebAppOpenWallPost', {
