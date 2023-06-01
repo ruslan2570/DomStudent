@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import bridge from '@vkontakte/vk-bridge';
 import PropTypes from 'prop-types';
 
@@ -12,9 +12,17 @@ const Auth = ({ id, go }) => {
 	const [password, setPassword] = useState('');
 
 	const Login = e => {
-		console.log(login);
-		console.log(password);
+		console.log({login, password});
 	}
+
+
+	//useEffect(() => 
+	//const ferchDate = async () => {
+	//		const respone = await fetch(' https://localhost:10888')
+	//		const data = await respone.json()
+	//		
+	//	}
+	//)
 
 	return(
 	<Panel id={id}>
