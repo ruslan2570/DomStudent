@@ -4,17 +4,15 @@ import { View, ScreenSpinner, AdaptivityProvider, AppRoot, ConfigProvider, Split
 import '@vkontakte/vkui/dist/vkui.css';
 
 import Home from './panels/Home';
-import Persik from './panels/Persik';
+import Auth from './panels/Auth';
 
 const App = () => {
-	const [activePanel, setActivePanel] = useState('home');
+	const [activePanel, setActivePanel] = useState('auth');
 	const [fetchedUser, setUser] = useState(null);
 	const [popout, setPopout] = useState(<ScreenSpinner size='large' />);
 
 	useEffect(() => {
 		async function fetchData() {
-			bridge.send('VKWebAppTapticImpactOccurred', {
-				style: 'heavy'});
 			const user = await bridge.send('VKWebAppGetUserInfo');
 			setUser(user);
 			setPopout(null);
@@ -24,6 +22,7 @@ const App = () => {
 
 	const go = e => {
 		setActivePanel(e.currentTarget.dataset.to);
+		bridge.send('VKWebAppTapticImpactOccurred', {style: 'heavy'});
 	};
 
 	return (
@@ -34,7 +33,7 @@ const App = () => {
 						<SplitCol>
 							<View activePanel={activePanel}>
 								<Home id='home' fetchedUser={fetchedUser} go={go} />
-								<Persik id='persik' go={go} />
+								<Auth id='auth' fetchedUser={fetchedUser} go={go} />
 							</View>
 						</SplitCol>
 					</SplitLayout>
