@@ -10,6 +10,7 @@ const App = () => {
 	const [activePanel, setActivePanel] = useState('auth');
 	const [fetchedUser, setUser] = useState(null);
 	const [popout, setPopout] = useState(<ScreenSpinner size='large' />);
+	const serverUrl = 'http://new-bokino.ru:49178/api/v1/'; 
 
 	useEffect(() => {
 		async function fetchData() {
