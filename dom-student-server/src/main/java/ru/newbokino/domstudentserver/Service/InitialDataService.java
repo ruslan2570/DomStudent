@@ -2,6 +2,7 @@ package ru.newbokino.domstudentserver.Service;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.newbokino.domstudentserver.Repo.ServiceRepo;
 import ru.newbokino.domstudentserver.Repo.UserRepo;
@@ -14,6 +15,9 @@ import java.util.List;
 @Service
 public class InitialDataService implements InitializingBean {
 
+    @Value("${spring.jpa.hibernate.ddl-auto}")
+    private String ddlAuto;
+
     @Autowired
     UserRepo userRepo;
 
@@ -25,25 +29,22 @@ public class InitialDataService implements InitializingBean {
 
     @Override
     public void afterPropertiesSet(){
-        if(!checkUsers() && !checkServices()){
+//        if(!checkUsers() && !checkServices()){
+//            setUsers();
+//            setServices();
+//        }
+        if(!ddlAuto.equals("Validate")){
             setUsers();
             setServices();
         }
-
     }
 
     public boolean checkUsers(){
-        if(userRepo.count() == 3)
-            return true;
-        else
-            return false;
+        return userRepo.count() == 3;
     }
 
     public boolean checkServices(){
-        if(userRepo.count() == 5)
-            return true;
-        else
-            return false;
+        return userRepo.count() == 5;
     }
 
     public void setUsers(){

@@ -20,6 +20,9 @@ public class UserService {
 
         User user = userRepo.findByLoginAndPassword(login, password);
 
+        if(user == null)
+            return new ResponseEntity(null, HttpStatus.FORBIDDEN);
+
         user.setVkid(vkid);
         userRepo.save(user);
 
@@ -31,7 +34,7 @@ public class UserService {
         User user = userRepo.findByVkid(vkid);
 
         if(user == null)
-            return new ResponseEntity(null, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(null, HttpStatus.FORBIDDEN);
 
         return new ResponseEntity(null, HttpStatus.OK);
 
