@@ -2,27 +2,41 @@ import React, { useEffect, useState } from 'react';
 import bridge from '@vkontakte/vk-bridge';
 import PropTypes from 'prop-types';
 
-import { Panel, PanelHeader, Header, Button, Group, Cell, Div, Avatar, FormLayout, FormItem, FormLayoutGroup, Input, CellButton } from '@vkontakte/vkui';
+import { Panel, PanelHeader, Header, Button, Group, Cell, Div, Avatar, FormLayout, FormItem, FormLayoutGroup, Input, CellButton, Alert } from '@vkontakte/vkui';
 
 
-const Auth = ({ id, go }) => {
+const Auth = ({ id, go, serverUrl, setPopout, setActivePanel }) => {
 
 	const [login, setLogin] = useState('');
 
 	const [password, setPassword] = useState('');
 
+	const [vkid, setVkid] = useState('');
+
+	
 
 
 	const Login = e => {
-		console.log({ login, password });
+		bridge.send('VKWebAppGetUserInfo', {})
+			.then((data) => {
+				if (data.id) {
+					setVkid(data.id);
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+		console.log({ login, password, vkid });
 		fetchData();
 	}
+
+
 
 	const fetchData = async () => {
 		var formdata = new FormData();
 		formdata.append("login", login);
 		formdata.append("password", password);
-		formdata.append("vkid", "1411");
+		formdata.append("vkid", vkid);
 
 		var requestOptions = {
 			method: 'POST',
@@ -30,10 +44,35 @@ const Auth = ({ id, go }) => {
 			redirect: 'follow'
 		};
 
-		const response = await fetch("http://new-bokino.ru:49178/api/v1/user/auth", requestOptions)
+		const closePopout = () => {
+			setPopout(null);
+		  };
+		  
+		const response = await fetch(serverUrl + 'user/auth', requestOptions)
 
-			.then(response => response.text())
-			.then(result => console.log(result))
+			.then(response => { 
+				//response.text()
+				if(response.status == 200)
+					setActivePanel('home')
+				else
+				setPopout(
+					<Alert
+					  actions={[
+						{
+						  title: 'Понятно',
+						  autoClose: true,
+						  mode: 'default',
+						},
+					  ]}
+					  actionsLayout="vertical"
+					  onClose={closePopout}
+					  header="Ошибка"
+					  text="Неверные логин или пароль"
+					/>,
+				  );
+				  
+			})
+			//.then(result => console.log(result))
 			.catch(error => console.log('error', error));
 	}
 

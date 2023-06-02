@@ -10,13 +10,23 @@ const App = () => {
 	const [activePanel, setActivePanel] = useState('auth');
 	const [fetchedUser, setUser] = useState(null);
 	const [popout, setPopout] = useState(<ScreenSpinner size='large' />);
-	const serverUrl = 'http://new-bokino.ru:49178/api/v1/'; 
+	const serverUrl = 'https://dss.new-bokino.ru/api/v1/'; 
+
+
 
 	useEffect(() => {
 		async function fetchData() {
 			const user = await bridge.send('VKWebAppGetUserInfo');
 			setUser(user);
+			var requestOptions = {
+				method: 'GET',
+				redirect: 'follow'
+			  };
+			  
+			  fetch(serverUrl + 'user/' + user.id, requestOptions)
+			  .then(response => response.status == 200 ? setActivePanel('home') : setActivePanel('auth'));
 			setPopout(null);
+
 		}
 		fetchData();
 	}, []);
@@ -34,7 +44,7 @@ const App = () => {
 						<SplitCol>
 							<View activePanel={activePanel}>
 								<Home id='home' fetchedUser={fetchedUser} go={go} />
-								<Auth id='auth' fetchedUser={fetchedUser} go={go} />
+								<Auth id='auth' fetchedUser={fetchedUser} go={go} serverUrl={serverUrl} setPopout={setPopout} setActivePanel={setActivePanel}/>
 							</View>
 						</SplitCol>
 					</SplitLayout>
