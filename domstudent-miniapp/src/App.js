@@ -12,8 +12,6 @@ const App = () => {
 	const [popout, setPopout] = useState(<ScreenSpinner size='large' />);
 	const serverUrl = 'https://dss.new-bokino.ru/api/v1/'; 
 
-
-
 	useEffect(() => {
 		async function fetchData() {
 			const user = await bridge.send('VKWebAppGetUserInfo');
@@ -26,7 +24,6 @@ const App = () => {
 			  fetch(serverUrl + 'user/' + user.id, requestOptions)
 			  .then(response => response.status == 200 ? setActivePanel('home') : setActivePanel('auth'));
 			setPopout(null);
-
 		}
 		fetchData();
 	}, []);

@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import bridge from '@vkontakte/vk-bridge';
 import PropTypes from 'prop-types';
 
-import { Panel, PanelHeader, Header, Button, Group, Cell, Div, Avatar, FormLayout, FormItem, FormLayoutGroup, Input, CellButton, Alert } from '@vkontakte/vkui';
+import { Panel, PanelHeader, Header, Button, Group, Cell, Div, 
+	Avatar, FormLayout, FormItem, FormLayoutGroup, Input, CellButton, Alert,
+	usePlatform, Platform } from '@vkontakte/vkui';
 
 
 const Auth = ({ id, go, serverUrl, setPopout, setActivePanel }) => {
+
+	const platform = usePlatform();
+	const isVKCOM = platform !== Platform.VKCOM;
 
 	const [login, setLogin] = useState('');
 
 	const [password, setPassword] = useState('');
 
 	const [vkid, setVkid] = useState('');
-
-	
-
 
 	const Login = e => {
 		bridge.send('VKWebAppGetUserInfo', {})
@@ -30,8 +31,6 @@ const Auth = ({ id, go, serverUrl, setPopout, setActivePanel }) => {
 		fetchData();
 	}
 
-
-
 	const fetchData = async () => {
 		var formdata = new FormData();
 		formdata.append("login", login);
@@ -46,37 +45,35 @@ const Auth = ({ id, go, serverUrl, setPopout, setActivePanel }) => {
 
 		const closePopout = () => {
 			setPopout(null);
-		  };
-		  
+		};
+
 		const response = await fetch(serverUrl + 'user/auth', requestOptions)
 
-			.then(response => { 
+			.then(response => {
 				//response.text()
-				if(response.status == 200)
+				if (response.status == 200)
 					setActivePanel('home')
 				else
-				setPopout(
-					<Alert
-					  actions={[
-						{
-						  title: 'Понятно',
-						  autoClose: true,
-						  mode: 'default',
-						},
-					  ]}
-					  actionsLayout="vertical"
-					  onClose={closePopout}
-					  header="Ошибка"
-					  text="Неверные логин или пароль"
-					/>,
-				  );
-				  
+					setPopout(
+						<Alert
+							actions={[
+								{
+									title: 'Понятно',
+									autoClose: true,
+									mode: 'default',
+								},
+							]}
+							actionsLayout="vertical"
+							onClose={closePopout}
+							header="Ошибка"
+							text="Неверные логин или пароль"
+						/>,
+					);
+
 			})
 			//.then(result => console.log(result))
 			.catch(error => console.log('error', error));
 	}
-
-
 
 	return (
 		<Panel id={id}>
@@ -99,14 +96,14 @@ const Auth = ({ id, go, serverUrl, setPopout, setActivePanel }) => {
 				</FormLayout>
 
 				<CellButton onClick={e => Login(e)}>Войти</CellButton>
-				<CellButton onClick={BecomeAClient}>Стать клиентом</CellButton>
+				{isVKCOM && (
 
+					<CellButton onClick={BecomeAClient}>Стать клиентом</CellButton>
+				)}
 
 			</Group>
 		</Panel>)
 };
-
-
 
 const BecomeAClient = () => {
 	bridge.send('VKWebAppOpenWallPost', {
