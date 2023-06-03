@@ -9,4 +9,6 @@ public interface UserRepo extends CrudRepository<User, Long> {
 
     public User findByVkid(int vkid);
 
+    public void deleteUserByVkid(int vkid);
+
 }

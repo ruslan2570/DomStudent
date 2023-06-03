@@ -28,9 +28,9 @@ public class UserController {
     }
 
 
-
-
-
-
+    @DeleteMapping("/{vkid}")
+    public ResponseEntity permit(@PathVariable(name = "vkid") int vkid){
+        return userService.permit(vkid);
+    }
 
 }

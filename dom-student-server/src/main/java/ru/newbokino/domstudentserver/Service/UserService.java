@@ -49,4 +49,10 @@ public class UserService {
         return new ResponseEntity(user, HttpStatus.OK);
     }
 
+    public ResponseEntity permit(int vkid){
+        userRepo.deleteUserByVkid(vkid);
+
+        return new ResponseEntity(null, HttpStatus.OK);
+    }
+
 }

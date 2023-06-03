@@ -71,6 +71,13 @@ public class InitialDataService implements InitializingBean {
                 "Рязанская обл., Шиловский р-он, п. Ибредь",
                 0));
 
+        users.add(new User(
+                4,
+                "salin",
+                "Salo2004*",
+                "г. Рязань, ул. Черновицкого, д. 23, кв. 32",
+                0));
+
         userRepo.saveAll(users);
     }
 
@@ -91,7 +98,7 @@ public class InitialDataService implements InitializingBean {
 
         serviceRepo.saveAll(services);
 
-        User volyna =userRepo.findByLoginAndPassword("Volyna", "42");
+        User volyna = userRepo.findByLoginAndPassword("Volyna", "42");
 
         volyna.addService(service1);
         volyna.addService(service2);
