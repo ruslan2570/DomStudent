@@ -8,10 +8,10 @@ import { Panel, PanelHeader, Header, Button, Group, Cell, Div,
 	usePlatform, Platform } from '@vkontakte/vkui';
 
 
-const Auth = ({ id, go, serverUrl, setPopout, setActivePanel }) => {
+const Auth = ({ id, serverUrl, setPopout, setActivePanel, fetchedUser }) => {
 
 	const platform = usePlatform();
-	const isVKCOM = platform !== Platform.VKCOM;
+	const isVKCOM = platform == Platform.VKCOM;
 
 	const [login, setLogin] = useState('');
 
@@ -19,18 +19,20 @@ const Auth = ({ id, go, serverUrl, setPopout, setActivePanel }) => {
 
 	const [vkid, setVkid] = useState('');
 
-	const Login = e => {
-		bridge.send('VKWebAppGetUserInfo', {})
-			.then((data) => {
-				if (data.id) {
-					setVkid(data.id);
-				}
-			})
-			.catch((error) => {
-				console.log(error);
-			});
-		console.log({ login, password, vkid });
+	const toLogin = e => {
+		setVkid(fetchedUser.id);
 		fetchData();
+		//  bridge.send('VKWebAppGetUserInfo', {})
+		// 	.then((data) => {
+		// 		if (data.id) {
+		// 			setVkid(data.id);
+		// 			console.log({ login, password, vkid });
+		// 			fetchData();
+		// 		}
+		// 	})
+		// 	.catch((error) => {
+		// 		console.log(error);
+		// 	});
 	}
 
 	const fetchData = async () => {
@@ -97,17 +99,17 @@ const Auth = ({ id, go, serverUrl, setPopout, setActivePanel }) => {
 					</FormLayoutGroup>
 				</FormLayout>
 
-				<CellButton onClick={e => Login(e)}>Войти</CellButton>
+				<CellButton onClick={e => toLogin(e)}>Войти</CellButton>
 				{isVKCOM && (
 
-					<CellButton onClick={BecomeAClient}>Стать клиентом</CellButton>
+					<CellButton onClick={becomeAClient}>Стать клиентом</CellButton>
 				)}
 
 			</Group>
 		</Panel>)
 };
 
-const BecomeAClient = () => {
+const becomeAClient = () => {
 	bridge.send('VKWebAppOpenWallPost', {
 		owner_id: -220910322,
 		post_id: 4
@@ -116,7 +118,17 @@ const BecomeAClient = () => {
 
 Auth.propTypes = {
 	id: PropTypes.string.isRequired,
-	go: PropTypes.func.isRequired,
+	serverUrl: PropTypes.string.isRequired,
+	setPopout: PropTypes.func.isRequired,
+	setActivePanel: PropTypes.func.isRequired,
+	fetchedUser: PropTypes.shape({
+		photo_200: PropTypes.string,
+		first_name: PropTypes.string,
+		last_name: PropTypes.string,
+		city: PropTypes.shape({
+			title: PropTypes.string,
+		}),
+	})
 };
 
 export default Auth;

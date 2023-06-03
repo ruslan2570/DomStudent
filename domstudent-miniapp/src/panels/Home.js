@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import bridge from '@vkontakte/vk-bridge';
 
-import { Panel, PanelHeader, Header, Button, Group, Cell, Div, Avatar, Epic, Alert, Tabbar, TabbarItem, Badge, View, Placeholder, CellButton } from '@vkontakte/vkui';
+import { Panel, PanelHeader, Header, Button, Group, Cell, Div, Avatar, Epic, Alert, Tabbar, TabbarItem, Badge, View, Placeholder, CellButton, SimpleCell, InfoRow } from '@vkontakte/vkui';
 import { Icon28NewsfeedOutline, Icon28ServicesOutline, Icon28MessageOutline, Icon28ClipOutline, Icon28UserCircleOutline } from '@vkontakte/icons';
 
 
-const Home = ({ id,  fetchedUser, serverUrl, setPopout, setActivePanel }) => {
+const Home = ({ id, fetchedUser, serverUrl, setPopout, setActivePanel }) => {
 
 	const [panelHeader, setPanelHeader] = useState('Главная');
 	const onStoryChange = (e) => {
@@ -48,7 +48,7 @@ const Home = ({ id,  fetchedUser, serverUrl, setPopout, setActivePanel }) => {
 	};
 
 	const fetchLogout = () => {
-		
+
 		var requestOptions = {
 			method: 'DELETE',
 			redirect: 'follow'
@@ -63,6 +63,32 @@ const Home = ({ id,  fetchedUser, serverUrl, setPopout, setActivePanel }) => {
 
 		console.log(serverUrl);
 	}
+	const [user,setUser] = useState(null);
+	const [servicesList, setServicesList] = useState(null);
+
+	useEffect(
+		() => {
+			var requestOptions = {
+				method: 'GET',
+				redirect: 'follow'
+			};
+
+			fetch(serverUrl + "user/" + fetchedUser.id, requestOptions)
+				.then(response => response.text())
+				.then(result => console.log(result))
+				.catch(error => console.log('error', error));
+
+			requestOptions = {
+				method: 'GET',
+				redirect: 'follow'
+			};
+
+			fetch(serverUrl + "service/" + fetchedUser.id, requestOptions)
+				.then(response => response.text())
+				.then(result => console.log(result))
+				.catch(error => console.log('error', error));
+		}
+	);
 
 	return (
 		<Panel id={id}>
@@ -123,7 +149,18 @@ const Home = ({ id,  fetchedUser, serverUrl, setPopout, setActivePanel }) => {
 
 						<Group header={<Header mode="secondary">Информация по договору</Header>}>
 							<Div>
-								Здесь будет информация
+								<SimpleCell>
+									<InfoRow header="Логин"></InfoRow>
+								</SimpleCell>
+								<SimpleCell>
+									<InfoRow header="№ договора">3000 р.</InfoRow>
+								</SimpleCell>
+								<SimpleCell>
+									<InfoRow header="Адрес">3000 р.</InfoRow>
+								</SimpleCell>
+								<SimpleCell>
+									<InfoRow header="Стоимость услуг">3000 р.</InfoRow>
+								</SimpleCell>
 							</Div>
 						</Group>
 					</Panel>
@@ -159,8 +196,8 @@ const Home = ({ id,  fetchedUser, serverUrl, setPopout, setActivePanel }) => {
 Home.propTypes = {
 	id: PropTypes.string.isRequired,
 	serverUrl: PropTypes.string.isRequired,
-	setPopout: PropTypes.string.isRequired,
-	setActivePanel: PropTypes.string.isRequired,
+	setPopout: PropTypes.func.isRequired,
+	setActivePanel: PropTypes.func.isRequired,
 	fetchedUser: PropTypes.shape({
 		photo_200: PropTypes.string,
 		first_name: PropTypes.string,
