@@ -50,7 +50,9 @@ public class UserService {
     }
 
     public ResponseEntity permit(int vkid){
-        userRepo.deleteUserByVkid(vkid);
+        User user = userRepo.findByVkid(vkid);
+        user.setVkid(0);
+        userRepo.save(user);
 
         return new ResponseEntity(null, HttpStatus.OK);
     }
