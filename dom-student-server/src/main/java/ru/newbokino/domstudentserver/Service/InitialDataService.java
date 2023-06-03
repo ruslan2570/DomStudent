@@ -29,22 +29,10 @@ public class InitialDataService implements InitializingBean {
 
     @Override
     public void afterPropertiesSet(){
-//        if(!checkUsers() && !checkServices()){
-//            setUsers();
-//            setServices();
-//        }
         if(!ddlAuto.equals("Validate")){
             setUsers();
             setServices();
         }
-    }
-
-    public boolean checkUsers(){
-        return userRepo.count() == 3;
-    }
-
-    public boolean checkServices(){
-        return userRepo.count() == 5;
     }
 
     public void setUsers(){
@@ -54,7 +42,7 @@ public class InitialDataService implements InitializingBean {
                1,
                "Volyna",
                "42",
-               "Рязань, ул. Островского, подвал 5",
+               "Рязань, ул. Островского, лавочка возле КБ",
                0));
 
         users.add(new User(

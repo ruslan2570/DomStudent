@@ -3,8 +3,9 @@ import PropTypes from 'prop-types';
 import bridge from '@vkontakte/vk-bridge';
 
 import { Panel, PanelHeader, Header, Button, Group, Cell, Div, Avatar, Epic, Alert, Tabbar, TabbarItem, Badge, View, Placeholder, CellButton, SimpleCell, InfoRow } from '@vkontakte/vkui';
-import { Icon28NewsfeedOutline, Icon28ServicesOutline, Icon28MessageOutline, Icon28ClipOutline, Icon28UserCircleOutline } from '@vkontakte/icons';
+import { Icon28NewsfeedOutline, Icon28ServicesOutline, Icon24NotificationOutline, Icon28UserCircleOutline } from '@vkontakte/icons';
 
+import Main from './Main';
 
 const Home = ({ id, fetchedUser, serverUrl, setPopout, setActivePanel }) => {
 
@@ -15,9 +16,8 @@ const Home = ({ id, fetchedUser, serverUrl, setPopout, setActivePanel }) => {
 	}
 	const [activeStory, setActiveStory] = useState('main');
 
-	const close = () => bridge.send('VKWebAppClose', {
-		status: 'success'
-	});
+	const close = () => bridge.send('VKWebAppClose', { status: 'success' });
+
 	const logout = () => {
 		setPopout(
 			<Alert
@@ -63,31 +63,52 @@ const Home = ({ id, fetchedUser, serverUrl, setPopout, setActivePanel }) => {
 
 		console.log(serverUrl);
 	}
-	const [user,setUser] = useState(null);
+	const [user, setUser] = useState(null);
 	const [servicesList, setServicesList] = useState(null);
+
+	console.log("home: ");
+	console.log(fetchedUser);
+	console.log(user);
 
 	useEffect(
 		() => {
-			var requestOptions = {
-				method: 'GET',
-				redirect: 'follow'
-			};
+			const fetchUser = async () => {
 
-			fetch(serverUrl + "user/" + fetchedUser.id, requestOptions)
-				.then(response => response.text())
-				.then(result => console.log(result))
-				.catch(error => console.log('error', error));
+				var requestOptions = {
+					method: 'GET',
+					redirect: 'follow'
+				};
 
-			requestOptions = {
-				method: 'GET',
-				redirect: 'follow'
-			};
+				fetch(serverUrl + "user/" + fetchedUser.id, requestOptions)
+					.then(response => response.json())
+					.then(result => {
+						setUser(result);
+					})
+					.catch(error => console.log('error', error));
 
-			fetch(serverUrl + "service/" + fetchedUser.id, requestOptions)
-				.then(response => response.text())
-				.then(result => console.log(result))
-				.catch(error => console.log('error', error));
-		}
+				requestOptions = {
+					method: 'GET',
+					redirect: 'follow'
+				};
+
+				fetch(serverUrl + "service/" + fetchedUser.id, requestOptions)
+					.then(response => response.json())
+					.then(result => {
+						setServicesList(result)
+						console.log("услуги");
+						console.log(user);
+						if (user != null) {
+							let userWithSum = user;
+							const sum = servicesList.array.reduce((accumulator, obj) => accumulator + obj.value, 0);
+							console.log(sum);
+							userWithSum.sum = sum;
+							setUser(userWithSum);
+						}
+					})
+					.catch(error => console.log('error', error));
+			}
+			fetchUser();
+		}, []
 	);
 
 	return (
@@ -121,7 +142,7 @@ const Home = ({ id, fetchedUser, serverUrl, setPopout, setActivePanel }) => {
 							data-story="notifications"
 							text="Уведомления"
 						>
-							<Icon28MessageOutline />
+							<Icon24NotificationOutline />
 						</TabbarItem>
 						<TabbarItem
 							onClick={onStoryChange}
@@ -134,37 +155,10 @@ const Home = ({ id, fetchedUser, serverUrl, setPopout, setActivePanel }) => {
 					</Tabbar>
 				}
 			>
-				<View id="main" activePanel="main">
-					<Panel id="main">
+				{user != null &&
+					<Main id="main" fetchedUser={fetchedUser} user={user}></Main>
+				}
 
-						{fetchedUser &&
-							<Group header={<Header mode="secondary">Данные профиля</Header>}>
-								<Cell
-									before={fetchedUser.photo_200 ? <Avatar src={fetchedUser.photo_200} /> : null}
-									subtitle={fetchedUser.city && fetchedUser.city.title ? fetchedUser.city.title : ''}
-								>
-									{`${fetchedUser.first_name} ${fetchedUser.last_name}`}
-								</Cell>
-							</Group>}
-
-						<Group header={<Header mode="secondary">Информация по договору</Header>}>
-							<Div>
-								<SimpleCell>
-									<InfoRow header="Логин"></InfoRow>
-								</SimpleCell>
-								<SimpleCell>
-									<InfoRow header="№ договора">3000 р.</InfoRow>
-								</SimpleCell>
-								<SimpleCell>
-									<InfoRow header="Адрес">3000 р.</InfoRow>
-								</SimpleCell>
-								<SimpleCell>
-									<InfoRow header="Стоимость услуг">3000 р.</InfoRow>
-								</SimpleCell>
-							</Div>
-						</Group>
-					</Panel>
-				</View>
 				<View id="services" activePanel="services">
 					<Panel id="services">
 						<Group style={{ height: '1000px' }}>
@@ -175,7 +169,7 @@ const Home = ({ id, fetchedUser, serverUrl, setPopout, setActivePanel }) => {
 				<View id="notifications" activePanel="notifications">
 					<Panel id="notifications">
 						<Group style={{ height: '1000px' }}>
-							<Placeholder icon={<Icon28MessageOutline width={56} height={56} />}></Placeholder>
+							<Placeholder icon={<Icon24NotificationOutline width={56} height={56} />}></Placeholder>
 						</Group>
 					</Panel>
 				</View>

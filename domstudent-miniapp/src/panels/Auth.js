@@ -36,6 +36,8 @@ const Auth = ({ id, serverUrl, setPopout, setActivePanel, fetchedUser }) => {
 	}
 
 	const fetchData = async () => {
+		setPopout(<ScreenSpinner size='large' />);
+
 		var formdata = new FormData();
 		formdata.append("login", login);
 		formdata.append("password", password);
@@ -51,12 +53,13 @@ const Auth = ({ id, serverUrl, setPopout, setActivePanel, fetchedUser }) => {
 			setPopout(null);
 		};
 
-		const response = await fetch(serverUrl + 'user/auth', requestOptions)
+		await fetch(serverUrl + 'user/auth', requestOptions)
 
 			.then(response => {
 				//response.text()
-				if (response.status == 200)
+				if (response.status == 200){
 					setActivePanel('home')
+				}
 				else
 					setPopout(
 						<Alert
