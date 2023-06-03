@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import bridge from '@vkontakte/vk-bridge';
+
 
 import { Panel, PanelHeader, Header, Button, Group, Cell, Div, 
 	Avatar, FormLayout, FormItem, FormLayoutGroup, Input, CellButton, Alert,

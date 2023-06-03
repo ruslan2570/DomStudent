@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import bridge from '@vkontakte/vk-bridge';
-import { View, ScreenSpinner, AdaptivityProvider, AppRoot, ConfigProvider, SplitLayout, SplitCol } from '@vkontakte/vkui';
+import { View, ScreenSpinner, AdaptivityProvider, AppRoot, ConfigProvider, SplitLayout, SplitCol, Panel } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
 import Home from './panels/Home';
@@ -11,6 +11,11 @@ const App = () => {
 	const [fetchedUser, setUser] = useState(null);
 	const [popout, setPopout] = useState(<ScreenSpinner size='large' />);
 	const serverUrl = 'https://dss.new-bokino.ru/api/v1/'; 
+	const goTo = (panel) => {	
+		setActivePanel(panel);
+		bridge.send('VKWebAppTapticImpactOccurred', {style: 'heavy'});
+	}
+
 
 	useEffect(() => {
 		async function fetchData() {
@@ -22,16 +27,14 @@ const App = () => {
 			  };
 			  
 			  fetch(serverUrl + 'user/' + user.id, requestOptions)
-			  .then(response => response.status == 200 ? setActivePanel('home') : setActivePanel('auth'));
+			  .then(response => response.status == 200 ? goTo('home') : goTo('auth'));
 			setPopout(null);
 		}
 		fetchData();
 	}, []);
 
-	const go = e => {
-		setActivePanel(e.currentTarget.dataset.to);
-		bridge.send('VKWebAppTapticImpactOccurred', {style: 'heavy'});
-	};
+	
+
 
 	return (
 		<ConfigProvider>
@@ -40,8 +43,8 @@ const App = () => {
 					<SplitLayout popout={popout}>
 						<SplitCol>
 							<View activePanel={activePanel}>
-								<Home id='home' fetchedUser={fetchedUser} go={go} />
-								<Auth id='auth' fetchedUser={fetchedUser} go={go} serverUrl={serverUrl} setPopout={setPopout} setActivePanel={setActivePanel}/>
+								<Home id='home' fetchedUser={fetchedUser}  serverUrl={serverUrl} setPopout={setPopout} setActivePanel={goTo}/>
+								<Auth id='auth' fetchedUser={fetchedUser}  serverUrl={serverUrl} setPopout={setPopout} setActivePanel={goTo}/>
 							</View>
 						</SplitCol>
 					</SplitLayout>
