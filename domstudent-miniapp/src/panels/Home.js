@@ -6,6 +6,9 @@ import { Panel, PanelHeader, Header, Button, Group, Cell, Div, Avatar, Epic, Ale
 import { Icon28NewsfeedOutline, Icon28ServicesOutline, Icon24NotificationOutline, Icon28UserCircleOutline } from '@vkontakte/icons';
 
 import Main from './Main';
+import Services from './Services';
+import Notifications from './Notifications';
+import Logout from './Logout';
 
 const Home = ({ id, fetchedUser, serverUrl, setPopout, setActivePanel }) => {
 
@@ -16,96 +19,37 @@ const Home = ({ id, fetchedUser, serverUrl, setPopout, setActivePanel }) => {
 	}
 	const [activeStory, setActiveStory] = useState('main');
 
-	const close = () => bridge.send('VKWebAppClose', { status: 'success' });
-
-	const logout = () => {
-		setPopout(
-			<Alert
-				actions={[
-					{
-						title: 'Выход',
-						mode: 'destructive',
-						autoClose: true,
-						action: fetchLogout,
-					},
-					{
-						title: 'Отмена',
-						autoClose: true,
-						mode: 'cancel',
-					},
-				]}
-				actionsLayout="vertical"
-				onClose={closePopout}
-				header="Выйти"
-				text="Вы уверены, что хотите выйти?"
-			/>,
-		);
-
-	};
-
 	const closePopout = () => {
 		setPopout(null);
 	};
-
-	const fetchLogout = () => {
-
-		var requestOptions = {
-			method: 'DELETE',
-			redirect: 'follow'
-		};
-
-		fetch(serverUrl + "user/" + fetchedUser.id, requestOptions)
-			.then(response => response.text())
-			.then(result => console.log(result))
-			.catch(error => console.log('error', error));
-
-		setActivePanel('auth');
-
-		console.log(serverUrl);
-	}
+	
 	const [user, setUser] = useState(null);
 	const [servicesList, setServicesList] = useState(null);
 
-	console.log("home: ");
-	console.log(fetchedUser);
-	console.log(user);
 
 	useEffect(
 		() => {
 			const fetchUser = async () => {
-
 				var requestOptions = {
 					method: 'GET',
 					redirect: 'follow'
 				};
 
-				fetch(serverUrl + "user/" + fetchedUser.id, requestOptions)
-					.then(response => response.json())
-					.then(result => {
-						setUser(result);
-					})
-					.catch(error => console.log('error', error));
+				const userResponse = await fetch(serverUrl + "user/" + fetchedUser.id, requestOptions);
+				const userResult = await userResponse.json();
+				setUser(userResult);
 
-				requestOptions = {
-					method: 'GET',
-					redirect: 'follow'
-				};
+				const serviceResponse = await fetch(serverUrl + "service/" + fetchedUser.id, requestOptions);
+				const serviceResult = await serviceResponse.json();
+				setServicesList(serviceResult);
 
-				fetch(serverUrl + "service/" + fetchedUser.id, requestOptions)
-					.then(response => response.json())
-					.then(result => {
-						setServicesList(result)
-						console.log("услуги");
-						console.log(user);
-						if (user != null) {
-							let userWithSum = user;
-							const sum = servicesList.array.reduce((accumulator, obj) => accumulator + obj.value, 0);
-							console.log(sum);
-							userWithSum.sum = sum;
-							setUser(userWithSum);
-						}
-					})
-					.catch(error => console.log('error', error));
+
+				if (userResult != null) {
+					let userWithSum = { ...userResult };
+					const sum = serviceResult.reduce((accumulator, obj) => accumulator + obj.price, 0);
+					userWithSum.sum = sum;
+					setUser(userWithSum);
+				}
 			}
 			fetchUser();
 		}, []
@@ -159,28 +103,12 @@ const Home = ({ id, fetchedUser, serverUrl, setPopout, setActivePanel }) => {
 					<Main id="main" fetchedUser={fetchedUser} user={user}></Main>
 				}
 
-				<View id="services" activePanel="services">
-					<Panel id="services">
-						<Group style={{ height: '1000px' }}>
-							<Placeholder icon={<Icon28ServicesOutline width={56} height={56} />}></Placeholder>
-						</Group>
-					</Panel>
-				</View>
-				<View id="notifications" activePanel="notifications">
-					<Panel id="notifications">
-						<Group style={{ height: '1000px' }}>
-							<Placeholder icon={<Icon24NotificationOutline width={56} height={56} />}></Placeholder>
-						</Group>
-					</Panel>
-				</View>
-				<View id="logout" activePanel="logout">
-					<Panel id="logout">
-						<Group style={{ height: '1000px' }}>
-							<CellButton onClick={close}>Выйти из приложения</CellButton>
-							<CellButton mode='danger' onClick={logout}>Выйти</CellButton>
-						</Group>
-					</Panel>
-				</View>
+				<Services id="services" servicesList={servicesList} user={user}></Services>
+
+
+				<Notifications id="notifications"></Notifications>
+
+				<Logout id="logout" setPopout={setPopout} closePopout={closePopout} serverUrl={serverUrl} fetchedUser={fetchedUser} setActivePanel={setActivePanel}></Logout>
 			</Epic>
 
 		</Panel>

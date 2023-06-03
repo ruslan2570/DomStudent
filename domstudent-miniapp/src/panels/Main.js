@@ -4,11 +4,6 @@ import { Panel, Header, Group, Cell, Div, Avatar, View, SimpleCell, InfoRow } fr
 
 const Main = ({id, fetchedUser, user}) => {
 
-    console.log("main: ");
-	console.log(fetchedUser);
-	console.log(user);
-
-
     return(
         <View id={id} activePanel={id}>
         <Panel id={id}>
