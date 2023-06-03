@@ -24,34 +24,35 @@ const Home = ({ id, fetchedUser, serverUrl, setPopout, setActivePanel }) => {
 	};
 	
 	const [user, setUser] = useState(null);
-	const [servicesList, setServicesList] = useState(null);
+	// const [servicesList, setServicesList] = useState(null);
 
+
+	const fetchData = async () => {
+		var requestOptions = {
+			method: 'GET',
+			redirect: 'follow'
+		};
+
+		const userResponse = await fetch(serverUrl + "user/" + fetchedUser.id, requestOptions);
+		const userResult = await userResponse.json();
+		setUser(userResult);
+
+		const serviceResponse = await fetch(serverUrl + "service/" + fetchedUser.id, requestOptions);
+		const serviceResult = await serviceResponse.json();
+		// setServicesList(serviceResult);
+
+
+		if (userResult != null) {
+			let userWithSum = { ...userResult };
+			const sum = serviceResult.reduce((accumulator, obj) => accumulator + obj.price, 0);
+			userWithSum.sum = sum;
+			setUser(userWithSum);
+		}
+	}
 
 	useEffect(
 		() => {
-			const fetchUser = async () => {
-				var requestOptions = {
-					method: 'GET',
-					redirect: 'follow'
-				};
-
-				const userResponse = await fetch(serverUrl + "user/" + fetchedUser.id, requestOptions);
-				const userResult = await userResponse.json();
-				setUser(userResult);
-
-				const serviceResponse = await fetch(serverUrl + "service/" + fetchedUser.id, requestOptions);
-				const serviceResult = await serviceResponse.json();
-				setServicesList(serviceResult);
-
-
-				if (userResult != null) {
-					let userWithSum = { ...userResult };
-					const sum = serviceResult.reduce((accumulator, obj) => accumulator + obj.price, 0);
-					userWithSum.sum = sum;
-					setUser(userWithSum);
-				}
-			}
-			fetchUser();
+			fetchData();
 		}, []
 	);
 
@@ -103,7 +104,7 @@ const Home = ({ id, fetchedUser, serverUrl, setPopout, setActivePanel }) => {
 					<Main id="main" fetchedUser={fetchedUser} user={user}></Main>
 				}
 
-				<Services id="services" servicesList={servicesList} user={user}></Services>
+				<Services id="services" user={user} serverUrl={serverUrl}></Services>
 
 
 				<Notifications id="notifications"></Notifications>

@@ -31,7 +31,7 @@ const Main = ({id, fetchedUser, user}) => {
                         <InfoRow header="Адрес">{user.address}</InfoRow>
                     </SimpleCell>
                     <SimpleCell>
-                        <InfoRow header="Стоимость услуг">{user.sum}</InfoRow>
+                        <InfoRow header="Стоимость услуг">{user.sum + " ₽"}</InfoRow>
                     </SimpleCell>
                 </Div>
             </Group>
